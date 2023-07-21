@@ -30,6 +30,7 @@ body {
   font-size: 30px;
   font-weight: 700;
   margin-bottom: -1rem;
+  margin-top: -1rem;
 }
 .form {
   display: flex;

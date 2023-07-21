@@ -1,6 +1,12 @@
 <template>
   <div class="absolute-center">
     <div class="logo">
+      <q-img
+        src="../assets/security-scan.png"
+        alt="logo"
+        width="5rem"
+        class="q-pb-xs q-mb-xs"
+      ></q-img>
       <h1 class="text-black">Sign In</h1>
     </div>
     <div class="form">

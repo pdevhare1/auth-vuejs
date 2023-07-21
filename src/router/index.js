@@ -1,43 +1,42 @@
-import { route } from "quasar/wrappers";
-import {
-  createRouter,
-  createMemoryHistory,
-  createWebHistory,
-  createWebHashHistory,
-} from "vue-router";
+import { createRouter } from "vue-router";
 import routes from "./routes";
+import { createWebHistory, createWebHashHistory } from "vue-router";
+import { route } from "quasar/wrappers";
 
-/*
- * If not building with SSR mode, you can
- * directly export the Router instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Router instance.
- */
+import { useQuasar, LocalStorage, Platform } from "quasar";
 
-export default route(function (/* { store, ssrContext } */) {
-  const createHistory = process.env.SERVER
-    ? createMemoryHistory
-    : process.env.VUE_ROUTER_MODE === "history"
-    ? createWebHistory
-    : createWebHashHistory;
-  var router;
+const createHistory = () => {
+  if (Platform.is.electron) {
+    return createWebHistory();
+  } else {
+    return createWebHashHistory();
+  }
+};
 
+export default route(function () {
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
-    history: createHistory(process.env.VUE_ROUTER_BASE),
+    history: createHistory(),
   });
 
-  // router.beforeEach((to, from, next) => {
-  //   const authToken = JSON.parse(localStorage.getItem("user-info")).auth_token;
-  //   if (typeof authToken !== "string" || authToken !== "abcd1234") {
-  //     next("/");
-  //   } else {
-  //     next("/home");
-  //   }
-  // });
+  Router.beforeEach((to, from, next) => {
+    const loggedIn = LocalStorage.getItem("user-info");
+
+    if (to.path === "/home") {
+      // Check if the user is logged in
+      if (loggedIn) {
+        // User is logged in, allow access to the "/home" page
+        next();
+      } else {
+        // User is not logged in, redirect to login page (or any other page you prefer)
+        next("/"); // Replace "/login" with your login page path
+      }
+    } else {
+      // For other pages, just continue to the next page
+      next();
+    }
+  });
 
   return Router;
 });
